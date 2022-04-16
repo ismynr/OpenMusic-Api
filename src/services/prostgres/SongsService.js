@@ -23,19 +23,11 @@ class SongsService {
         return result.rows[0].id;
     }
 
-    async getSongs(search) {
-        const { title, performer } = search;
-        let query = 'SELECT * FROM songs ';
-
-        if (title != null && performer != null) {
-            query += `WHERE LOWER(title) LIKE LOWER('%${title}%')
-                        AND LOWER(performer) LIKE LOWER('%${performer}%')`;
-        } else if (title) {
-            query += `WHERE LOWER(title) LIKE LOWER('%${title}%')`;
-        } else if (performer) {
-            query += `WHERE LOWER(performer) LIKE LOWER('%${performer}%')`;
-        }
-        const result = await this._pool.query(query);
+    async getSongs({ title = '', performer = '' }) {
+        const result = await this._pool.query({
+            text: 'SELECT id, title, performer FROM songs WHERE LOWER(title) LIKE LOWER($1) AND LOWER(performer) LIKE LOWER($2)',
+            values: [`%${title}%`, `%${performer}%`],
+        });
         return result.rows.map(shortSongs);
     }
 
@@ -55,9 +47,6 @@ class SongsService {
             text: 'SELECT * FROM songs WHERE album_id = $1',
             values: [albumId],
         });
-        if (!result.rows.length) {
-            throw new NotFoundError('Songs tidak ditemukan');
-        }
         return result.rows.map(longSongs);
     }
 

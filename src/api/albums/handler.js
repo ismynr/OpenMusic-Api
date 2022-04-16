@@ -10,11 +10,10 @@ class AlbumsHandler {
         autoBind(this);
     }
 
-    async postAlbumHandler(request, h) {
+    async postAlbumHandler({ payload }, h) {
         try {
-            this._validator.validateAlbumPayload(request.payload);
-            const { name, year } = request.payload;
-            const albumId = await this._service.addAlbums({ name, year });
+            this._validator.validateAlbumPayload(payload);
+            const albumId = await this._service.addAlbums(payload);
             const response = h.response({
                 status: 'success',
                 message: 'Album berhasil ditambahkan',
