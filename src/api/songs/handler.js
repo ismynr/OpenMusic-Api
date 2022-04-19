@@ -8,6 +8,12 @@ class SongsHandler {
         autoBind(this);
     }
 
+    /**
+     * This function is used to add a song to the database.
+     * @param request - the request object
+     * @param h - the response toolkit
+     * @returns The response object is being returned.
+     */
     async postSongHandler(request, h) {
         try {
             this._validator.validateSongPayload(request.payload);
@@ -46,6 +52,12 @@ class SongsHandler {
         }
     }
 
+    /**
+     * It's a function that returns the songs if success without invariant error
+     * @param request - The request object.
+     * @param h - The hapi response toolkit object.
+     * @returns The return value is an object
+     */
     async getSongsHandler(request, h) {
         try {
             const { query } = request;
@@ -67,6 +79,13 @@ class SongsHandler {
         }
     }
 
+    /**
+     * This function is used to get a song by its id, and if the song is not found, it will return a
+     * 404 error, and if there is an error in the server, it will return a 500 error.
+     * @param request - The request object.
+     * @param h - is the response object
+     * @returns The return value is a response object.
+     */
     async getSongByIdHandler(request, h) {
         try {
             const { id } = request.params;
@@ -97,6 +116,14 @@ class SongsHandler {
         }
     }
 
+    /**
+     * This function is used to update a song by id, and it will return a success message if the
+     * song is updated successfully, or it will return a fail message if the song is not updated
+     * successfully, or it will return an error message if there is an error on the server.
+     * @param request - The request object.
+     * @param h - is the response object
+     * @returns The return value is a response object.
+     */
     async putSongByIdHandler(request, h) {
         try {
             this._validator.validateSongPayload(request.payload);
@@ -126,6 +153,12 @@ class SongsHandler {
         }
     }
 
+    /**
+     * This function is used to delete a song by its id.
+     * @param request - The request object.
+     * @param h - is the response object
+     * @returns The return value of the handler is a response object.
+     */
     async deleteSongByIdHandler(request, h) {
         try {
             const { id } = request.params;

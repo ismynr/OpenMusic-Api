@@ -10,6 +10,11 @@ class AlbumsHandler {
         autoBind(this);
     }
 
+    /**
+     * This function is used to add an album to the database.
+     * @param h - The hapi request object.
+     * @returns The response object is being returned.
+     */
     async postAlbumHandler({ payload }, h) {
         try {
             this._validator.validateAlbumPayload(payload);
@@ -43,16 +48,25 @@ class AlbumsHandler {
         }
     }
 
+    /**
+     * This function is used to get an album by its id, and if the album is found, it will also get
+     * the songs that belong to that album.
+     * @param request - The request object.
+     * @param h - The response toolkit.
+     * @returns The return value is an object with the following properties:
+     */
     async getAlbumByIdHandler(request, h) {
         try {
             const { id } = request.params;
             const album = await this._service.getAlbumById(id);
-            try {
-                const songs = await this._songsService.getSongsByAlbumId(id);
-                album.songs = songs;
-            } catch (error) {
-                // no action
-            }
+            const songs = await this._songsService.getSongsByAlbumId(id);
+            album.songs = songs;
+            // try {
+            //     const songs = await this._songsService.getSongsByAlbumId(id);
+            //     album.songs = songs;
+            // } catch (error) {
+            //     // no action
+            // }
             return {
                 status: 'success',
                 data: {
@@ -79,6 +93,14 @@ class AlbumsHandler {
         }
     }
 
+    /**
+     * This function is used to update an album by id, and it will return a success message if the
+     * album is updated successfully, or it will return a fail message if the album is not updated
+     * successfully, or it will return an error message if there is an error on the server.
+     * @param request - The request object.
+     * @param h - is the response object
+     * @returns The return value is a response object.
+     */
     async putAlbumByIdHandler(request, h) {
         try {
             this._validator.validateAlbumPayload(request.payload);
@@ -108,6 +130,12 @@ class AlbumsHandler {
         }
     }
 
+    /**
+     * This function is used to delete an album by its id.
+     * @param request - The request object.
+     * @param h - The response toolkit.
+     * @returns The return value of the handler is a response object.
+     */
     async deleteAlbumByIdHandler(request, h) {
         try {
             const { id } = request.params;
