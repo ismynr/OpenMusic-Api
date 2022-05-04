@@ -55,6 +55,20 @@ class AlbumsService {
     }
 
     /**
+     * This function is used to update value from column cover in the album data by id
+     * @param id - The id of the album to update.
+     */
+    async addCoverValueById(id, cover) {
+        const result = await this._pool.query({
+            text: 'UPDATE albums SET cover = $1 WHERE id = $2 RETURNING id',
+            values: [cover, id],
+        });
+        if (!result.rows.length) {
+            throw new NotFoundError('Gagal memperbarui albums. Id tidak ditemukan');
+        }
+    }
+
+    /**
      * Delete an album by id, if the album doesn't exist, throw an error
      * @param id - The id of the album to delete.
      */
