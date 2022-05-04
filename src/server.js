@@ -35,6 +35,10 @@ const CollaborationsValidator = require('./validator/collaborations');
 const playlistSongActivities = require('./api/playlist_song_activities');
 const PlaylistSongActivitiesService = require('./services/postgres/PlaylistSongActivitiesService');
 
+const _exports = require('./api/exports');
+const ProducerService = require('./services/rabbitmq/ProducerService');
+const ExportsValidator = require('./validator/exports');
+
 const init = async () => {
     const albumsService = new AlbumsService();
     const songsService = new SongsService();
@@ -150,6 +154,16 @@ const init = async () => {
                     playlistSongActivitiesService,
                     playlistsService,
                 },
+            },
+        },
+        {
+            plugin: _exports,
+            options: {
+                service: {
+                    ProducerService,
+                    playlistsService,
+                },
+                validator: ExportsValidator,
             },
         },
     ]);
