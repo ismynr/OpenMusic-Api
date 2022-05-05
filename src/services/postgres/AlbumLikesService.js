@@ -3,8 +3,9 @@ const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 
 class AlbumLikesService {
-    constructor() {
+    constructor(cacheService) {
         this._pool = new Pool();
+        this._cacheService = cacheService;
     }
 
     /**
@@ -22,6 +23,7 @@ class AlbumLikesService {
         if (!result.rows[0].id) {
             throw new InvariantError('Gagal menyukai album');
         }
+        await this._cacheService.delete('openmusic:album-likes');
         return 'Berhasil menyukai album';
     }
 
@@ -39,6 +41,7 @@ class AlbumLikesService {
         if (!result.rows[0].id) {
             throw new InvariantError('Gagal untuk batal menyukai album');
         }
+        await this._cacheService.delete('openmusic:album-likes');
         return 'Berhasil batal menyukai album';
     }
 
@@ -62,12 +65,25 @@ class AlbumLikesService {
      * @param albumId - The id of the album
      * @returns The result of the query.
      */
-    async countAlbumLikesByAlbumId(albumId) {
-        const result = await this._pool.query({
-            text: 'SELECT COUNT(id) AS jumlah FROM user_album_likes WHERE album_id = $1',
-            values: [albumId],
-        });
-        return result.rows[0].jumlah;
+    async getAlbumLikesByAlbumId(albumId) {
+        try {
+            const result = await this._cacheService.get('openmusic:album-likes');
+            return {
+                dataSource: 'cache',
+                likes: JSON.parse(result),
+            };
+        } catch (error) {
+            const result = await this._pool.query({
+                text: 'SELECT COUNT(id) AS jumlah FROM user_album_likes WHERE album_id = $1',
+                values: [albumId],
+            });
+            const jumlah = parseInt(result.rows[0].jumlah, 10);
+            await this._cacheService.set('openmusic:album-likes', JSON.stringify(jumlah));
+            return {
+                dataSource: 'database',
+                likes: jumlah,
+            };
+        }
     }
 }
 

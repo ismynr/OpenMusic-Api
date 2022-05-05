@@ -50,14 +50,15 @@ class AlbumLikesHandler {
     async countAlbumLikesHandler(request, h) {
         try {
             const { id: albumId } = request.params;
-            let likes = await this._service.countAlbumLikesByAlbumId(albumId);
-            likes = parseInt(likes, 10);
-            return {
+            const { dataSource, likes } = await this._service.getAlbumLikesByAlbumId(albumId);
+            const response = h.response({
                 status: 'success',
                 data: {
                     likes,
                 },
-            };
+            });
+            response.header('X-Data-Source', dataSource);
+            return response;
         } catch (error) {
             if (error instanceof ClientError) {
                 const response = h.response({
