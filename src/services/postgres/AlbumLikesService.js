@@ -23,7 +23,7 @@ class AlbumLikesService {
         if (!result.rows[0].id) {
             throw new InvariantError('Gagal menyukai album');
         }
-        await this._cacheService.delete('openmusic:album-likes');
+        // await this._cacheService.delete('openmusic:album-likes');
         return 'Berhasil menyukai album';
     }
 
@@ -41,7 +41,7 @@ class AlbumLikesService {
         if (!result.rows[0].id) {
             throw new InvariantError('Gagal untuk batal menyukai album');
         }
-        await this._cacheService.delete('openmusic:album-likes');
+        // await this._cacheService.delete('openmusic:album-likes');
         return 'Berhasil batal menyukai album';
     }
 
@@ -67,10 +67,20 @@ class AlbumLikesService {
      */
     async getAlbumLikesByAlbumId(albumId) {
         try {
-            const result = await this._cacheService.get('openmusic:album-likes');
+            // const result = await this._cacheService.get('openmusic:album-likes');
+            // return {
+            //     dataSource: 'cache',
+            //     likes: JSON.parse(result),
+            // };
+            const result = await this._pool.query({
+                text: 'SELECT COUNT(id) AS jumlah FROM user_album_likes WHERE album_id = $1',
+                values: [albumId],
+            });
+            const jumlah = parseInt(result.rows[0].jumlah, 10);
+            // await this._cacheService.set('openmusic:album-likes', JSON.stringify(jumlah));
             return {
-                dataSource: 'cache',
-                likes: JSON.parse(result),
+                dataSource: 'database',
+                likes: jumlah,
             };
         } catch (error) {
             const result = await this._pool.query({
@@ -78,7 +88,7 @@ class AlbumLikesService {
                 values: [albumId],
             });
             const jumlah = parseInt(result.rows[0].jumlah, 10);
-            await this._cacheService.set('openmusic:album-likes', JSON.stringify(jumlah));
+            // await this._cacheService.set('openmusic:album-likes', JSON.stringify(jumlah));
             return {
                 dataSource: 'database',
                 likes: jumlah,
